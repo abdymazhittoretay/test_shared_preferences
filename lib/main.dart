@@ -28,11 +28,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final TextEditingController _controller = TextEditingController();
   int? _counter;
+  String? _text;
 
-  void getData() async {
+  Future<void> getData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
+      _text = prefs.getString("text") ?? "";
       _counter = prefs.getInt("counter") ?? 0;
     });
   }
@@ -43,7 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
     getData();
   }
 
-  void _incrementCounter() async {
+  Future<void> _incrementCounter() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _counter = prefs.getInt("counter") ?? 0;
@@ -69,6 +72,31 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
+            SizedBox(
+              width: MediaQuery.sizeOf(context).width * 0.5,
+              child: TextField(
+                controller: _controller,
+                textAlign: TextAlign.center,
+              ),
+            ),
+            SizedBox(height: 16.0),
+            TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () async {
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                prefs.setString("text", _controller.text);
+                setState(() {
+                  _text = _controller.text;
+                });
+                _controller.clear();
+              },
+              child: Text("Save text"),
+            ),
+            SizedBox(height: 16.0),
+            Text(_text ?? ""),
           ],
         ),
       ),
